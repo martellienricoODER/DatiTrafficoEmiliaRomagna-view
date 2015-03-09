@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <meta name="generator" content="PSPad editor, www.pspad.com">
+  <title></title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/skeate/Leaflet.timeline/master/dist/leaflet.timeline.css">
+
+
+    <style>
+      .map-wrap {         
+         border: 3px solid #000;         
+         width: 1024px;         
+         height: 600px;   
+      }   
+      #map {         
+         width: 1024px;         
+         height: 600px;   
+      }
+      
+      .leaflet-control-container .leaflet-timeline-controls{
+        box-sizing: border-box;
+        width: 550px;
+        margin: 1px;
+        margin-bottom: 1px;
+      }
+
+    </style>
+
+  </head>
+  <body>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/skeate/Leaflet.timeline/master/dist/leaflet.timeline.js"></script>
+
+    <script type="text/javascript" src="https://cdn.rawgit.com/martellienricoODER/provaTraffico/master/DAT/ER_COM(s20).js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/martellienricoODER/provaTraffico/master/DAT/UPM.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/martellienricoODER/provaTraffico/master/DAT/MTS.js"></script>
+                                             
+    <div class="map-wrap">
+        <div id="map"></div>
+    </div>
+    <script type="text/javascript">
+
+   
+    
+      var map = new L.Map('map');
+      var url = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+      var attrib = 'Map data (c)OpenStreetMap contributors</br>Banca dati Limiti comunali - Regione Emilia-Romagna - CC-BY 2.5</br>martellienrico@gmail.com';
+      var osm = new L.TileLayer(url, {minZoom: 8, maxZoom: 16, attribution: attrib});
+      map.setView([44.549,11.115],8);
+      map.addLayer(osm);
+      
+
+                                    
+      var ER_COM_style = {
+            "weight": 3,
+            "color": "#0F0",
+            "opacity": 1,
+            "fillColor": "#B0DE5C",
+            "fillOpacity": 0.2
+      };
+
+      var ER_COM = L.geoJson( ER_COM_s20_geojson
+                            , { style: ER_COM_style
+                              , onEachFeature: function (feature, layer) {if (feature.properties && feature.properties.ISTAT) {
+                                                                                layer.bindPopup(        feature.properties.ISTAT 
+                                                                                                + " - " + feature.properties.NOME 
+                                                                                                + " ("  + feature.properties.SIGLA_PRO + ")");                                                                   
+                                                                        }
+                                                                       }                              });
+
+      
+      var UPM_style = {
+            "radius": 3,
+            "weight": 1,
+            "color": "#00F",
+            "opacity": 1,
+            "fillColor": "#00F",
+            "fillOpacity": 0.8
+      };
+      var UPM = L.geoJson(UPM_geojson
+                         , { pointToLayer: function (feature, latlng) {return L.circleMarker(latlng, UPM_style);}
+                           , onEachFeature: function (feature, layer) {if (feature.properties && feature.properties.POS) {
+                                                                             layer.bindPopup(        feature.properties.POS 
+                                                                                             + " - " + feature.properties.TRT 
+                                                                                             + " ("  + feature.properties.NNC + ")");                                                                   
+                                                                          }
+                                                                      }
+                           });
+
+      map.addLayer(UPM)
+
+
+
+
+      var MTS = L.timeline(MTS_geojson
+                          , { pointToLayer: function (feature, latlng) {var huemin=180;
+                                                                        var huemax=360;
+                                                                        var hue=feature.properties.VAL/1000*(huemax-huemin)+huemin;
+                                                                        var radmin=3;
+                                                                        var radmax=30;
+                                                                        var rad=feature.properties.VAL/1000*(radmax-radmin)+radmin;
+                                                                          
+                                                                        return L.circleMarker(latlng, {"radius": rad
+                                                                                                     ,"weight": 1   
+                                                                                                     ,"color": "hsl("+hue+", 100%, 50%)"
+                                                                                                     ,"opacity": 1
+                                                                                                     ,"fillColor": "hsl("+hue+", 100%, 50%)"
+                                                                                                     ,"fillOpacity": 0.8}
+                                                                                             );
+                                                                       }
+                             ,showTicks:false                                          
+                            }
+                          );
+
+      map.addLayer(MTS)
+                                                                                                                                      
+
+
+
+
+
+
+      
+var mappe_sfondo = {
+    "OpenStreetMap": osm,
+    "ER-Limiti Comunali": ER_COM
+
+};
+
+var mappe_dati = {
+    "Postazioni": UPM,
+    "Misure": MTS
+
+};
+
+L.control.layers(mappe_sfondo, mappe_dati).addTo(map);
+L.control.scale().addTo(map)
+      
+    </script>
+
+  </body>
+</html>
+                                       
