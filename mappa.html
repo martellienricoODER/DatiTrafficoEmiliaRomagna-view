@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <link rel="stylesheet" href="https://cdn.rawgit.com/skeate/Leaflet.timeline/master/dist/leaflet.timeline.css">
 
+    
+
 
     <style>
       .map-wrap {         
@@ -30,12 +32,15 @@
 
   </head>
   <body>
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/skeate/Leaflet.timeline/master/dist/leaflet.timeline.js"></script>
+    <!--script type="text/javascript" src="../../BIN/JS/leaflet/leaflet.timeline.js"></script-->
 
-    <script type="text/javascript" src="https://cdn.rawgit.com/martellienricoODER/provaTraffico/master/DAT/ER_COM(s20).js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/martellienricoODER/provaTraffico/master/DAT/UPM.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/martellienricoODER/provaTraffico/master/DAT/MTS.js"></script>
+    <script type="text/javascript" src="../../DAT/ER_COM(s20).js"></script>
+    <script type="text/javascript" src="../../DAT/UPM.js"></script>
+    <script type="text/javascript" src="../../DAT/MTS.js"></script>
+    <script type="text/javascript" src="../../DAT/MTS_FES.js"></script>
+    <script type="text/javascript" src="../../DAT/MTS_FER.js"></script>
                                              
     <div class="map-wrap">
         <div id="map"></div>
@@ -46,7 +51,7 @@
     
       var map = new L.Map('map');
       var url = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-      var attrib = 'Map data (c)OpenStreetMap contributors</br>Banca dati Limiti comunali - Regione Emilia-Romagna - CC-BY 2.5</br>martellienrico@gmail.com';
+      var attrib = 'Map data (c)OpenStreetMap contributors|OpendataER</br>Banca dati Limiti comunali - Regione Emilia-Romagna - CC-BY 2.5</br>Dati traffico - Regione Emilia-Romagna - 2014 </br>curato da: martellienrico@gmail.com';
       var osm = new L.TileLayer(url, {minZoom: 8, maxZoom: 16, attribution: attrib});
       map.setView([44.549,11.115],8);
       map.addLayer(osm);
@@ -92,51 +97,62 @@
       map.addLayer(UPM)
 
 
+    function MTS_style(feature, latlng) {
+        var huemin=180;
+        var huemax=360;
+        var hue=feature.properties.VAL/1000*(huemax-huemin)+huemin;
+        var radmin=3;
+        var radmax=30;
+        var rad=feature.properties.VAL/1000*(radmax-radmin)+radmin;
+          
+        return L.circleMarker(latlng, {"radius": rad
+                                     ,"weight": 1   
+                                     ,"color": "hsl("+hue+", 100%, 50%)"
+                                     ,"opacity": 1
+                                     ,"fillColor": "hsl("+hue+", 100%, 50%)"
+                                     ,"fillOpacity": 0.8}
+                             );
+       };  
+
+    function MTS_feature_data(feature, layer) {
+        layer.bindPopup(  ((feature.properties.DTA)?"Giorno: "+feature.properties.DTA+"</br>":"") + "Veicoli: " + feature.properties.DAT                                                                    
+                       )
+       };
+
+                                                                                                                                      
+      var MTS_FES = L.geoJson(MTS_FES_geojson, { pointToLayer:MTS_style, onEachFeature:MTS_feature_data});
+//      map.addLayer(MTS_FES)
+
+      var MTS_FER = L.geoJson(MTS_FER_geojson, { pointToLayer:MTS_style, onEachFeature:MTS_feature_data});
+//      map.addLayer(MTS_FER)
 
 
-      var MTS = L.timeline(MTS_geojson
-                          , { pointToLayer: function (feature, latlng) {var huemin=180;
-                                                                        var huemax=360;
-                                                                        var hue=feature.properties.VAL/1000*(huemax-huemin)+huemin;
-                                                                        var radmin=3;
-                                                                        var radmax=30;
-                                                                        var rad=feature.properties.VAL/1000*(radmax-radmin)+radmin;
-                                                                          
-                                                                        return L.circleMarker(latlng, {"radius": rad
-                                                                                                     ,"weight": 1   
-                                                                                                     ,"color": "hsl("+hue+", 100%, 50%)"
-                                                                                                     ,"opacity": 1
-                                                                                                     ,"fillColor": "hsl("+hue+", 100%, 50%)"
-                                                                                                     ,"fillOpacity": 0.8}
-                                                                                             );
-                                                                       }
-                             ,showTicks:false                                          
-                            }
+
+      var MTS = L.timeline(MTS_geojson, { pointToLayer:MTS_style
+                                        , onEachFeature:MTS_feature_data
+                                        , showTicks:false
+                                        , duration:60000}                                          
                           );
 
       map.addLayer(MTS)
-                                                                                                                                      
-
-
-
-
 
 
       
 var mappe_sfondo = {
-    "OpenStreetMap": osm,
-    "ER-Limiti Comunali": ER_COM
+    "Tutti i veicoli (timeline)": MTS,
+    "Tutti i veicoli (media gg FESTIVI)": MTS_FES,
+    "Tutti i veicoli (media gg FERIALI)": MTS_FER
 
 };
 
 var mappe_dati = {
     "Postazioni": UPM,
-    "Misure": MTS
+    "ER-Limiti Comunali": ER_COM
 
 };
 
 L.control.layers(mappe_sfondo, mappe_dati).addTo(map);
-L.control.scale().addTo(map)
+L.control.scale({ position: 'topleft' }).addTo(map)
       
     </script>
 
