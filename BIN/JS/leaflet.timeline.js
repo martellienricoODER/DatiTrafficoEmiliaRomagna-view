@@ -370,7 +370,7 @@ http://leafletjs.com
       for (i = 0; i < leaflet_timeline_controls_to_remove.length; i++) {
         leaflet_timeline_controls_to_remove[i].parentNode.removeChild(leaflet_timeline_controls_to_remove[i]);
         }
-      this.container.classList.remove('playing');  
+      this._timeSlider.value = this.end;  
 
       container = L.DomUtil.create('div', 'leaflet-control-layers ' + 'leaflet-control-layers-expanded ' + 'leaflet-timeline-controls ');
       if (this.timeline.options.enablePlayback) {
