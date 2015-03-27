@@ -1,4 +1,4 @@
-# provaTraffico
-primo tentativo
+# DatiTrafficoEmiliaRomagna-view
 
-la mia prima mappa!
+prove tecniche di visualizzazione dei dati del traffico rilevato dalla Regione Emilia Romagna
+
