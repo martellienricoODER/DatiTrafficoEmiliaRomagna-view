@@ -29,11 +29,19 @@
       </header>
       <section>
         <h3>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Work in progress</h3>
+Work in progress</h3>
 
+
+<h2> Visualizzazione dei dati del traffico rilevati dalla regione Emilia Romagna (periodo 01.01.2014 - 31.08.2014)</h2>
+
+<h4>
+ Da un idea lanciata dal gruppo <a href="https://www.facebook.com/groups/opendataemiliaromagna">Open Data Emilia Romagna</a>
+</h4> 
+
+
+<b>MAPPE</b>
 <p>
-<b> Visualizzazione dei dati del traffico rilevati dalla regione Emilia Romagna (periodo 01.01.2014 - 31.08.2014)
-</b>
+Mappe realizzate sfruttando la libreria <a href="http://leafletjs.com/" target="_blank">LEAFLET</a> (..e altre):
 <ul>
  <li><a href="./mappa_pub.html" target="_blank">mappa con marker e animazione</a> - mappa semplice con ubicazione dei punti di misura, traffico medio feriale e festivo, layer animato;
 </li>
@@ -42,6 +50,26 @@
 </ul>
 </p>
 
+<b>SQL</b>
+<p>
+Script sql utilizzati per importare e normalizzare i dati in output e generare i file JSON utilizzati nelle mappe:
+<ul>
+<li>sl3_upm100.sql      </li> - import dei dati relativi ai punti di misura (file origine: anagrafica.csv)  
+<li>sl3_mts100.sql      </li> - import dei dati relativi al traffico rilevato (file origine: MTS_2014.csv) 
+<li>sl3_dat2json.sql    </li> - aggregazione dei dati per alimentare la mappa HEAT 
+<li>sl3_dat2json_val.sql</li> - formattazione dei dati aggregati per alimentare la mappa HEAT  
+<li>sl3_trachr.sql      </li> - script per la trascodifica dei caratteri particolari 
+</ul>
+</p>
+
+<b>PROSSIMI PASSI</b>
+<p>
+ <ul>
+  <li>Animazione della mappa HEAT</li>
+  <li>Integrazione con altre basi dati</li>
+  <li>... unico limite la fantasia!</li>
+ </ul>
+</p>
 <!--
 <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
 
