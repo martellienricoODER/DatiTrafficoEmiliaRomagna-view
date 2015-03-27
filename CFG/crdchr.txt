@@ -1,0 +1,6 @@
+chr,des
+°,gradi
+',primi
+'',secondi
+.,decimali
+"",secondi

@@ -159,7 +159,15 @@ http://leafletjs.com
     removeLayer: function(layer, removeDisplayed) {
       if (removeDisplayed == null) {
         removeDisplayed = true;
+      //remove control  
+      var leaflet_timeline_controls_to_remove = document.getElementsByClassName("leaflet-timeline-controls");
+      var i;
+      for (i = 0; i < leaflet_timeline_controls_to_remove.length; i++) {
+        leaflet_timeline_controls_to_remove[i].parentNode.removeChild(leaflet_timeline_controls_to_remove[i]);
+        }
+
       }
+
       L.GeoJSON.prototype.removeLayer.call(this, layer);
       if (removeDisplayed) {
         return this.displayedLayers = this.displayedLayers.filter(function(displayedLayer) {
@@ -364,14 +372,14 @@ http://leafletjs.com
       var buttonContainer, container;
       this.map = map;
       
-      //remove control  
-      var leaflet_timeline_controls_to_remove = document.getElementsByClassName("leaflet-timeline-controls");
-      var i;
-      for (i = 0; i < leaflet_timeline_controls_to_remove.length; i++) {
-        leaflet_timeline_controls_to_remove[i].parentNode.removeChild(leaflet_timeline_controls_to_remove[i]);
-        }
-      clearTimeout(this._timer);  
-      this.timeline.setTime(this.start);  
+//      remove control  
+//      var leaflet_timeline_controls_to_remove = document.getElementsByClassName("leaflet-timeline-controls");
+//      var i;
+//      for (i = 0; i < leaflet_timeline_controls_to_remove.length; i++) {
+//        leaflet_timeline_controls_to_remove[i].parentNode.removeChild(leaflet_timeline_controls_to_remove[i]);
+//        }
+//      clearTimeout(this._timer);  
+//      this.timeline.setTime(this.start);  
 
       container = L.DomUtil.create('div', 'leaflet-control-layers ' + 'leaflet-control-layers-expanded ' + 'leaflet-timeline-controls ');
       if (this.timeline.options.enablePlayback) {

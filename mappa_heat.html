@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <meta name="generator" content="PSPad editor, www.pspad.com">
+  <title></title>
+
+    <link rel="stylesheet" href="./BIN/JS/leaflet.css" />
+    <script type="text/javascript" src="./BIN/JS/leaflet.js"></script>
+    <script type="text/javascript" src="./BIN/JS/heatmap.min.js"></script>
+    <script type="text/javascript" src="./BIN/JS/leaflet-heatmap.js"></script>
+    <style>
+      .map-wrap {         
+         border: 3px solid #000;         
+         width: 1024px;         
+         height: 600px;   
+      }   
+      #map {        
+         width: 1024px;         
+         height: 600px;   
+      }
+      /*necessario perchč heat ricopre tutto*/
+      .leaflet-overlay-pane svg {
+        z-index: 1000;
+      }
+
+
+      .leaflet-popup-content {
+        font-family: monospace;
+      }
+      th.des  {
+        width: 50px;
+      }      
+      th.dat {
+        width: 80px;
+      }      
+      td.des  {
+        text-align:left;
+      }      
+      td.dat {
+        text-align:right;
+      }
+
+    </style>
+
+  </head>
+  <body>
+
+    <!--script type="text/javascript" src="./DAT/ER_COM(s20).js"></script-->
+    <!--script type="text/javascript" src="./DAT/UPM.js"></script-->
+    <!--script type="text/javascript" src="./DAT/MTS.js"></script-->
+    <!--script type="text/javascript" src="./DAT/MTS_FES.js"></script-->
+    <!--script type="text/javascript" src="./DAT/MTS_FER.js"></script-->
+   
+    <script type="text/javascript" src="./DAT/DAT.js"></script>                                         
+    
+    <div class="map-wrap">
+        <div id="map"></div>
+    </div>
+    <script type="text/javascript">
+
+    function json2dataLayer(input_data){
+      var UPM_geojson = {type: "FeatureCollection"
+                        ,crs : {type      : "name"
+                               ,properties: { name: "urn:ogc:def:crs:OGC:1.3:CRS84" } }
+                        ,features: []
+                        };  
+      var wrkdat={FER:[],FES:[]};
+      var maxval={FER:0,FES:0};
+      var curval={FER:0,FES:0};
+                       
+                        
+      for (i=0; i<input_data.length; i++) {
+          UPM_geojson.features.push({type      : "Feature"
+                                    ,properties: { "POS": input_data[i].UPM[1]
+                                                 , "TRT": input_data[i].UPM[2]
+                                                 , "NNC": input_data[i].UPM[3]
+                                                 , "PKM": input_data[i].UPM[4] 
+                                                 , "TOTALL": input_data[i].MTS_ALL.CNT.V
+                                                 , "TOTFER": input_data[i].MTS_FER.CNT.V
+                                                 , "TOTFES": input_data[i].MTS_FES.CNT.V 
+                                                 , "AVGALL": input_data[i].MTS_ALL.AVG.V
+                                                 , "AVGFER": input_data[i].MTS_FER.AVG.V
+                                                 , "AVGFES": input_data[i].MTS_FES.AVG.V 
+                                                 , "TOTALLAUT": input_data[i].MTS_ALL.CNT.D.AUT.V
+                                                 , "TOTFERAUT": input_data[i].MTS_FER.CNT.D.AUT.V
+                                                 , "TOTFESAUT": input_data[i].MTS_FES.CNT.D.AUT.V 
+                                                 , "AVGALLAUT": input_data[i].MTS_ALL.AVG.D.AUT.V
+                                                 , "AVGFERAUT": input_data[i].MTS_FER.AVG.D.AUT.V
+                                                 , "AVGFESAUT": input_data[i].MTS_FES.AVG.D.AUT.V 
+                                                 , "TOTALLCAM": input_data[i].MTS_ALL.CNT.D.CAM.V
+                                                 , "TOTFERCAM": input_data[i].MTS_FER.CNT.D.CAM.V
+                                                 , "TOTFESCAM": input_data[i].MTS_FES.CNT.D.CAM.V 
+                                                 , "AVGALLCAM": input_data[i].MTS_ALL.AVG.D.CAM.V
+                                                 , "AVGFERCAM": input_data[i].MTS_FER.AVG.D.CAM.V
+                                                 , "AVGFESCAM": input_data[i].MTS_FES.AVG.D.CAM.V 
+                                                 , "TOTALLATR": input_data[i].MTS_ALL.CNT.D.ATR.V
+                                                 , "TOTFERATR": input_data[i].MTS_FER.CNT.D.ATR.V
+                                                 , "TOTFESATR": input_data[i].MTS_FES.CNT.D.ATR.V 
+                                                 , "AVGALLATR": input_data[i].MTS_ALL.AVG.D.ATR.V
+                                                 , "AVGFERATR": input_data[i].MTS_FER.AVG.D.ATR.V
+                                                 , "AVGFESATR": input_data[i].MTS_FES.AVG.D.ATR.V 
+                                                 , "TOTALLBEA": input_data[i].MTS_ALL.CNT.D.BEA.V
+                                                 , "TOTFERBEA": input_data[i].MTS_FER.CNT.D.BEA.V
+                                                 , "TOTFESBEA": input_data[i].MTS_FES.CNT.D.BEA.V 
+                                                 , "AVGALLBEA": input_data[i].MTS_ALL.AVG.D.BEA.V
+                                                 , "AVGFERBEA": input_data[i].MTS_FER.AVG.D.BEA.V
+                                                 , "AVGFESBEA": input_data[i].MTS_FES.AVG.D.BEA.V 
+                                                 }
+                                    ,geometry  : { type       : "Point"
+                                                 , coordinates: [ input_data[i].UPM[6], input_data[i].UPM[5] ] 
+                                                 } 
+                                    });      
+
+          curval.FER=parseInt(input_data[i].MTS_FER.AVG.V);
+          curval.FES=parseInt(input_data[i].MTS_FES.AVG.V);
+                  
+          maxval.FER=(curval.FER>maxval.FER)?curval.FER:maxval.FER;
+          maxval.FES=(curval.FES>maxval.FES)?curval.FES:maxval.FES;
+          
+          wrkdat.FER.push({"lat":input_data[i].UPM[5]
+                          ,"lon":input_data[i].UPM[6]
+                          ,"val":curval.FER
+                          })
+          wrkdat.FES.push({"lat":input_data[i].UPM[5]
+                          ,"lon":input_data[i].UPM[6]
+                          ,"val":curval.FES
+                          })
+      };
+      
+      return {MTS_UPM: UPM_geojson,MTS_FER:{max: maxval.FER,data: wrkdat.FER}
+                                  ,MTS_FES:{max: maxval.FES,data: wrkdat.FES}}
+      
+/*    
+      var wrkdat=[];
+      var maxval=0;
+      var curval=0;
+      for (i=0; i<input_data.features.length; i++) {
+        curval=parseInt(input_data.features[i].properties.DAT)
+        maxval=(curval>maxval)?curval:maxval;
+        wrkdat.push({"lat":input_data.features[i].geometry.coordinates[1]
+                    ,"lon":input_data.features[i].geometry.coordinates[0]
+                    ,"val":curval
+                    })
+      }
+      
+      return {max: maxval,
+              data: wrkdat};
+*/    
+    }
+
+    function upmData2html(dat){
+    var htm="Postazione:&nbsp;" + dat.POS + "&nbsp;Nr.&nbsp;corsie:&nbsp;" + dat.NNC + "<br>Tratto:&nbsp;" + dat.TRT + " <br>                                                                                                \
+               <table>                                                                                                                        \
+               <tr><th class=\"des\">&nbsp;</th><th class=\"dat\">TUTTI</th><th class=\"dat\">FERIALI</th><th class=\"dat\">FESTIVI</th></tr> \
+               <tr><td class=\"des\">TOTALE   </td><td class=\"dat\">" + dat.TOTALL + "<br>(" + dat.AVGALL + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFER + "<br>(" + dat.AVGFER + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFES + "<br>(" + dat.AVGFES + ")</td></tr>                        \
+               <tr><td class=\"des\">AUTO     </td><td class=\"dat\">" + dat.TOTALLAUT + "<br>(" + dat.AVGALLAUT + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFERAUT + "<br>(" + dat.AVGFERAUT + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFESAUT + "<br>(" + dat.AVGFESAUT + ")</td></tr>                        \
+               <tr><td class=\"des\">CAMION   </td><td class=\"dat\">" + dat.TOTALLCAM + "<br>(" + dat.AVGALLCAM + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFERCAM + "<br>(" + dat.AVGFERCAM + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFESCAM + "<br>(" + dat.AVGFESCAM + ")</td></tr>                        \
+               <tr><td class=\"des\">AUTOTRENI</td><td class=\"dat\">" + dat.TOTALLATR + "<br>(" + dat.AVGALLATR + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFERATR + "<br>(" + dat.AVGFERATR + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFESATR + "<br>(" + dat.AVGFESATR + ")</td></tr>                        \
+               <tr><td class=\"des\">BUS/ALTRO</td><td class=\"dat\">" + dat.TOTALLBEA + "<br>(" + dat.AVGALLBEA + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFERBEA + "<br>(" + dat.AVGFERBEA + ")</td>                             \
+                                                   <td class=\"dat\">" + dat.TOTFESBEA + "<br>(" + dat.AVGFESBEA + ")</td></tr>                        \
+               </table>                                                                                                                      \
+                                                                                                                                             \
+      ";
+    return htm
+    }
+    
+      var attrib = 'Map data (c)OpenStreetMap contributors|OpendataER</br>Dati traffico - Regione Emilia-Romagna - 2014 </br>curato da: OpenDataER (martellienrico@gmail.com)';
+      var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {minZoom: 1, maxZoom: 16, attribution: attrib});
+
+      dataLayer =json2dataLayer(DAT_json)
+
+
+      var UPM = L.geoJson(dataLayer.MTS_UPM
+                         , { pointToLayer: function (feature, latlng){return L.circleMarker(latlng, {"radius": 3,
+                                                                                                     "weight": 1,
+                                                                                                     "color": "#00F",
+                                                                                                     "opacity": 1,
+                                                                                                     "fillColor": "#00F",
+                                                                                                     "fillOpacity": 0.8});}
+                           , onEachFeature: function (feature, layer) {if (feature.properties && feature.properties.POS) {layer.bindPopup(upmData2html(feature.properties));}}
+                           });
+/*
+     var MTS_FES_heat=geoJson2heatdata(MTS_FES_geojson);
+      var MTS_FER_heat=geoJson2heatdata(MTS_FER_geojson);
+*/      
+var heat_cfg = {
+  // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+  // if scaleRadius is false it will be the constant radius used in pixels
+  "radius": 0.075,
+  "maxOpacity": 0.7, 
+  // scales the radius based on map zoom
+  "scaleRadius": true, 
+  // if set to false the heatmap uses the global maximum for colorization
+  // if activated: uses the data maximum within the current map boundaries 
+  //   (there will always be a red spot with useLocalExtremas true)
+  "useLocalExtrema": true,
+  // which field name in your data represents the latitude - default "lat"
+  latField: 'lat',
+  // which field name in your data represents the longitude - default "lng"
+  lngField: 'lon',
+  // which field name in your data represents the data value - default "value"
+  valueField: 'val'
+};
+
+    
+
+      var map = new L.Map('map');
+      map.setView([44.549,11.115],8);
+      //aggiungo il controllo per far scegliere quale layer visualizzare (i layer verranno aggiunti dopo)
+      var ctrl_layers = new L.control.layers({},{},{position:"topright"}).addTo(map);
+      //aggiungo la scala (solo Km) 
+      L.control.scale({position: 'bottomleft',imperial: false}).addTo(map)
+
+
+      map.addLayer(osm);
+
+
+      
+
+
+      var MTS_FES_heatmap = new HeatmapOverlay(heat_cfg);
+      map.addLayer(MTS_FES_heatmap);
+      MTS_FES_heatmap.setData(dataLayer.MTS_FES);
+      
+      var MTS_FER_heatmap = new HeatmapOverlay(heat_cfg);
+      map.addLayer(MTS_FER_heatmap);
+      MTS_FER_heatmap.setData(dataLayer.MTS_FER);
+
+      //necessario per avere il radio button coerente con i dati visualizzati (altrimenti il primo cambio layer gira a vuoto)
+      map.removeLayer(MTS_FES_heatmap);
+
+      ctrl_layers.addBaseLayer(MTS_FER_heatmap, "Tutti i veicoli (media gg FERIALI)" );
+      ctrl_layers.addBaseLayer( MTS_FES_heatmap, "Tutti i veicoli (media gg FESTIVI)" );
+
+
+      map.on('baselayerchange',function(e) {
+          UPM.bringToFront();
+      });     
+
+      map.addLayer(UPM);
+      UPM.bringToFront();
+      ctrl_layers.addOverlay(UPM,"Postazioni");
+
+
+
+    
+ 
+
+
+
+
+/*                                    
+      var ER_COM_style = {
+            "weight": 3,
+            "color": "#0F0",
+            "opacity": 1,
+            "fillColor": "#B0DE5C",
+            "fillOpacity": 0.2
+      };
+
+      var ER_COM = L.geoJson( ER_COM_s20_geojson
+                            , { style: ER_COM_style
+                              , onEachFeature: function (feature, layer) {if (feature.properties && feature.properties.ISTAT) {
+                                                                                layer.bindPopup(        feature.properties.ISTAT 
+                                                                                                + " - " + feature.properties.NOME 
+                                                                                                + " ("  + feature.properties.SIGLA_PRO + ")");                                                                   
+                                                                        }
+                                                                       }                              });
+
+
+
+    function MTS_style(feature, latlng) {
+        var huemin=180;
+        var huemax=360;
+        var hue=feature.properties.VAL/1000*(huemax-huemin)+huemin;
+        var radmin=3;
+        var radmax=30;
+        var rad=feature.properties.VAL/1000*(radmax-radmin)+radmin;
+          
+        return L.circleMarker(latlng, {"radius": rad
+                                     ,"weight": 1   
+                                     ,"color": "hsl("+hue+", 100%, 50%)"
+                                     ,"opacity": 1
+                                     ,"fillColor": "hsl("+hue+", 100%, 50%)"
+                                     ,"fillOpacity": 0.8}
+                             );
+       };  
+
+    function MTS_feature_data(feature, layer) {
+        layer.bindPopup(  ((feature.properties.DTA)?"Giorno: "+feature.properties.DTA+"</br>":"") + "Veicoli: " + feature.properties.DAT                                                                    
+                       )
+       };
+
+                                                                                                                                      
+      var MTS_FES = L.geoJson(MTS_FES_geojson, { pointToLayer:MTS_style, onEachFeature:MTS_feature_data});
+//      map.addLayer(MTS_FES)
+
+      var MTS_FER = L.geoJson(MTS_FER_geojson, { pointToLayer:MTS_style, onEachFeature:MTS_feature_data});
+//      map.addLayer(MTS_FER)
+
+
+
+      var MTS = L.timeline(MTS_geojson, { pointToLayer:MTS_style
+                                        , onEachFeature:MTS_feature_data
+                                        , showTicks:false
+                                        , duration:60000}                                          
+                          );
+
+      map.addLayer(MTS)
+
+
+*/      
+/*      
+var mappe_sfondo = {
+//    "Tutti i veicoli (timeline)": MTS,
+//    "Tutti i veicoli (media gg FESTIVI)": MTS_FES,
+//    "Tutti i veicoli (media gg FERIALI)": MTS_FER
+
+};
+
+var mappe_dati = {
+      "Postazioni": UPM
+//    , "ER-Limiti Comunali": ER_COM
+
+};
+
+L.control.layers(mappe_sfondo, mappe_dati).addTo(map);
+
+L.control.scale({ position: 'topleft' }).addTo(map)
+*/      
+    </script>
+
+  </body>
+</html>
+                                       
